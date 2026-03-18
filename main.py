@@ -5,7 +5,7 @@ import google.generativeai as genai
 from flask import Flask, render_template
 
 # Танзимоти калидҳо аз Render Environment
-TOKEN = os.environ.get('TELEGRAM_TOKEN')
+TOKEN = os.environ.get('8780142915:AAE7lMwsS4O1S5V2MhOmn2JQ3Nf_iZDifcQ')
 API_KEY = os.environ.get('GEMINI_API_KEY')
 
 bot = telebot.TeleBot(TOKEN)
