@@ -47,7 +47,7 @@ def security(message):
 
 @bot.message_handler(func=lambda message: message.text == '🎧 Дастгирӣ')
 def support(message):
-    bot.reply_to(message, "🎧 **Маркази дастгирӣ**\n\nАдмин: @saidjun")
+    bot.reply_to(message, "🎧 **Маркази дастгирӣ**\n\nАдмин: @Shumakher03")
 
 # ҶАВОБИ AI БА ПАЁМҲОИ ОДДӢ
 @bot.message_handler(func=lambda message: True)
