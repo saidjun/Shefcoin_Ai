@@ -35,7 +35,7 @@ def profile(message):
 
 @bot.message_handler(func=lambda message: message.text == '💰 Баланс' or message.text == '/top_up')
 def balance(message):
-    bot.reply_to(message, "💰 **Пур кардани баланс**\n\nБарои гузаронидани маблағ ба @saidjun нависед.")
+    bot.reply_to(message, "💰 **Пур кардани баланс**\n\nБарои гузаронидани маблағ ба @Shumakher03 нависед.")
 
 @bot.message_handler(func=lambda message: message.text == '👨‍💻 IT Expert' or message.text == '/it_expert')
 def it_expert(message):
