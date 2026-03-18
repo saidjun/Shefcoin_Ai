@@ -1,34 +1,41 @@
-import os, sqlite3, telebot, random
+import os, sqlite3, telebot, random, time
 from telebot import types
 
+# МАЪЛУМОТИ ТУ
 TOKEN = '8780142915:AAE7lMwsS4O1S5V2MhOmn2JQ3Nf_iZDifcQ'
 ADMIN_ID = 6967256070 
 WEB_URL = "https://shefcoin-app.onrender.com" 
 
 bot = telebot.TeleBot(TOKEN)
 
-# --- БАЗАИ МАЪЛУМОТ ---
+# --- 1. БАЗАИ МАЪЛУМОТ (Ҳамаи сутунҳо) ---
 def db_query(sql, params=()):
-    with sqlite3.connect('shef_ghost_v30.db', check_same_thread=False) as conn:
+    with sqlite3.connect('shef_final_v31.db', check_same_thread=False) as conn:
         cursor = conn.cursor()
         cursor.execute(sql, params)
         conn.commit()
         return cursor.fetchall()
 
 db_query('''CREATE TABLE IF NOT EXISTS users 
-           (id INTEGER PRIMARY KEY, name TEXT, balance REAL DEFAULT 0, 
-            points REAL DEFAULT 0, vault REAL DEFAULT 0, 
-            badge TEXT DEFAULT '', inventory TEXT DEFAULT '', 
+           (id INTEGER PRIMARY KEY, 
+            name TEXT, 
+            balance REAL DEFAULT 0, 
+            points REAL DEFAULT 0, 
+            vault REAL DEFAULT 0, 
+            badge TEXT DEFAULT '', 
+            inventory TEXT DEFAULT '', 
             internal_number INTEGER)''')
 
-# --- МЕНЮҲО ---
+# --- 2. МЕНЮИ АСОСӢ (Reply Markup) ---
 def main_menu():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.row(types.KeyboardButton("🚀 КУШОДАНИ SHEF APP", web_app=types.WebAppInfo(WEB_URL)))
-    markup.row('🏦 Сандуқ', '🎒 Инвентар', '🏆 Рейтинг')
-    markup.row('💬 Чат-Рулёт', '⚙️ Танзимот')
+    markup.row('🏦 Сандуқи Махфӣ', '🎒 Инвентар')
+    markup.row('🏆 Рейтинг', '🔄 Табдилдиҳӣ')
+    markup.row('💬 Чат-Рулёт (NEW)', '⚙️ Танзимот')
     return markup
 
+# --- 3. САРШАВӢ ВА ID-И МАХФӢ ---
 @bot.message_handler(commands=['start'])
 def start(m):
     uid = m.from_user.id
@@ -48,43 +55,58 @@ def start(m):
         current_num = user[0][0]
 
     formatted_id = f"ID-{str(current_num).zfill(6)}"
-    bot.send_message(m.chat.id, f"🛰 **SHEFCOIN v30.0**\n\n🆔 Рақами махфии шумо: `{formatted_id}`\n\nХуш омадед ба Империяи махфӣ!", reply_markup=main_menu(), parse_mode='Markdown')
+    bot.send_message(m.chat.id, f"🛰 **SHEFCOIN v31.0**\n\n🆔 Рақами махфии шумо: `{formatted_id}`", 
+                     reply_markup=main_menu(), parse_mode='Markdown')
 
-# --- ⚙️ ТАНЗИМОТ ВА НЕСТ КАРДАН ---
-@bot.message_handler(func=lambda m: m.text == '⚙️ Танзимот')
-def settings(m):
+# --- 4. САНДУҚИ МАХФӢ (Vault Logic) ---
+@bot.message_handler(func=lambda m: m.text == '🏦 Сандуқи Махфӣ')
+def vault_manager(m):
+    res = db_query("SELECT balance, vault FROM users WHERE id=?", (m.from_user.id,))
+    bal, vlt = res[0]
+    text = f"🏦 **Сандуқи шумо:**\n💰 Баланси асосӣ: `{bal}` TJS\n🔒 Дар сандуқ: `{vlt}` TJS"
+    
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("❌ Нест кардани Профил", callback_data="delete_profile"))
-    bot.send_message(m.chat.id, "⚙️ **Танзимоти профил:**\n\nОгоҳӣ: Агар профилро нест кунед, ҳамаи холҳо ва ID-и шумо абадӣ тоза мешаванд.", reply_markup=markup, parse_mode='Markdown')
+    markup.row(types.InlineKeyboardButton("📥 Ба сандуқ", callback_data="v_in"),
+               types.InlineKeyboardButton("📤 Аз сандуқ", callback_data="v_out"))
+    bot.send_message(m.chat.id, text, reply_markup=markup, parse_mode='Markdown')
 
-@bot.callback_query_handler(func=lambda call: call.data == "delete_profile")
-def delete_confirm(call):
-    uid = call.from_user.id
-    db_query("DELETE FROM users WHERE id=?", (uid,))
-    bot.answer_callback_query(call.id, "🗑 Профили шумо нест карда шуд!", show_alert=True)
-    bot.send_message(call.message.chat.id, "🚪 Шумо Империяро тарк кард ва ҳама чиз сӯхт. Барои аз нав сар кардан /start-ро пахш кунед.")
+# --- 5. ТАНЗИМОТ ВА НЕСТ КАРДАН (Privacy) ---
+@bot.message_handler(func=lambda m: m.text == '⚙️ Танзимот')
+def settings_page(m):
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("❌ Нест кардани Профил", callback_data="delete_me"))
+    bot.send_message(m.chat.id, "⚙️ **Танзимот:**\n\nАгар профилро нест кунед, рақами ID ва холҳоятон месузанд.", 
+                     reply_markup=markup)
 
-# --- 🏆 РЕЙТИНГ (МАХФӢ) ---
+@bot.callback_query_handler(func=lambda call: call.data == "delete_me")
+def delete_process(call):
+    db_query("DELETE FROM users WHERE id=?", (call.from_user.id,))
+    bot.answer_callback_query(call.id, "🔥 Профил сӯхт!", show_alert=True)
+    bot.send_message(call.message.chat.id, "🚪 Шумо Империяро тарк кардед. Барои оғози нав: /start")
+
+# --- 6. РЕЙТИНГИ МАХФӢ (Бе нишон додани ID) ---
 @bot.message_handler(func=lambda m: m.text == '🏆 Рейтинг')
 def leaderboard(m):
-    # Дар ин ҷо internal_number-ро нишон намедиҳем, то махфӣ монад
     users = db_query("SELECT name, points, badge FROM users ORDER BY points DESC LIMIT 10")
-    text = "🏆 **ТОП-10 МАЙНЕРОНИ МАХФӢ:**\n\n"
+    text = "🏆 **ТОП-10 МАЙНЕРОН:**\n\n"
     for i, u in enumerate(users, 1):
         text += f"{i}. {u[2]} {u[0]} — `{u[1]:.2f} хол` \n"
     bot.send_message(m.chat.id, text, parse_mode='Markdown')
 
-# --- 💬 ДИГАР ФУНКСИЯҲО ---
-@bot.message_handler(func=lambda m: m.text in ['🏦 Сандуқ', '🎒 Инвентар', '💬 Чат-Рулёт'])
-def handle_all(m):
-    uid = m.from_user.id
-    if m.text == '🏦 Сандуқ':
-        res = db_query("SELECT balance, vault FROM users WHERE id=?", (uid,))
-        bot.send_message(m.chat.id, f"🏦 Сандуқи шумо:\n💰 Баланс: {res[0][0]} TJS\n🔒 Маҳфуз: {res[0][1]} TJS")
-    elif m.text == '🎒 Инвентар':
-        res = db_query("SELECT inventory FROM users WHERE id=?", (uid,))
-        bot.send_message(m.chat.id, f"🎒 Инвентар: {res[0][0] if res[0][0] else 'Холӣ'}")
-    elif m.text == '💬 Чат-Рулёт':
-        bot.send_message(m.chat.id, "🔍 Ҷустуҷӯи ҳамсӯҳбати махфӣ...")
+# --- 7. ИНВЕНТАР ВА ПЕРЕВОД ---
+@bot.message_handler(func=lambda m: m.text == '🎒 Инвентар')
+def inventory_check(m):
+    res = db_query("SELECT inventory FROM users WHERE id=?", (m.from_user.id,))
+    bot.send_message(m.chat.id, f"🎒 **Борхалта:**\n{res[0][0] if res[0][0] else 'Холӣ'}")
+
+@bot.message_handler(commands=['send'])
+def transfer(m):
+    try:
+        _, to_id, amt, t_type = m.text.split()
+        col = "balance" if t_type == "money" else "points"
+        db_query(f"UPDATE users SET {col} = {col} - ? WHERE id = ?", (float(amt), m.from_user.id))
+        db_query(f"UPDATE users SET {col} = {col} + ? WHERE id = ?", (float(amt), int(to_id)))
+        bot.reply_to(m, "✅ Иҷро шуд!")
+    except: bot.reply_to(m, "📝 Мисол: `/send ID 100 points`")
 
 bot.infinity_polling()
