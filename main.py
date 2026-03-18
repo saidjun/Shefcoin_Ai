@@ -1,108 +1,90 @@
-import os, threading, sqlite3, telebot, time, random
-import google.generativeai as genai
-from flask import Flask, render_template
+import os, sqlite3, telebot, random
+from telebot import types
 
-# --- ТАНЗИМОТ ---
 TOKEN = '8780142915:AAE7lMwsS4O1S5V2MhOmn2JQ3Nf_iZDifcQ'
-API_KEY = 'AIzaSyAF (Калиди Gemini-и шумо)'
 ADMIN_ID = 6967256070 
+WEB_URL = "https://shefcoin-app.onrender.com" 
 
 bot = telebot.TeleBot(TOKEN)
-genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
-app = Flask(__name__)
 
-# --- БАЗАИ МАЪЛУМОТ (V14) ---
+# --- БАЗАИ МАЪЛУМОТ ---
 def db_query(sql, params=()):
-    with sqlite3.connect('shefcoin_final_boss.db', check_same_thread=False) as conn:
+    with sqlite3.connect('shef_ghost_v30.db', check_same_thread=False) as conn:
         cursor = conn.cursor()
         cursor.execute(sql, params)
         conn.commit()
         return cursor.fetchall()
 
 db_query('''CREATE TABLE IF NOT EXISTS users 
-           (id INTEGER PRIMARY KEY, name TEXT, balance REAL, vip INTEGER, vpn_exp INTEGER, photo TEXT, bio TEXT)''')
-db_query('''CREATE TABLE IF NOT EXISTS vouchers (code TEXT PRIMARY KEY, amount REAL)''')
-db_query('''CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)''')
+           (id INTEGER PRIMARY KEY, name TEXT, balance REAL DEFAULT 0, 
+            points REAL DEFAULT 0, vault REAL DEFAULT 0, 
+            badge TEXT DEFAULT '', inventory TEXT DEFAULT '', 
+            internal_number INTEGER)''')
 
-# --- WEB SERVER ---
-@app.route('/')
-def index(): return render_template('index.html')
-
-# --- МЕНЮИ WHATSAPP STYLE ---
-def main_markup(uid):
-    markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.row('👤 Профили Ман', '💬 Чатҳо', '🤖 AI Gemini')
-    markup.row('👑 VIP Зинаҳо', '🛡 VPN Premium')
-    markup.row('💳 Баланс / QR', '🎟 Ваучер', '🎧 Дастгирии Зинда 🛡')
-    markup.row('📊 Асъор', '🛠 Конструктор', '⭐️ Отзывҳо')
-    if uid == ADMIN_ID: markup.row('👑 Панели Админ', '➕ Сохтани Ваучер', '📸 Ивази QR')
+# --- МЕНЮҲО ---
+def main_menu():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.row(types.KeyboardButton("🚀 КУШОДАНИ SHEF APP", web_app=types.WebAppInfo(WEB_URL)))
+    markup.row('🏦 Сандуқ', '🎒 Инвентар', '🏆 Рейтинг')
+    markup.row('💬 Чат-Рулёт', '⚙️ Танзимот')
     return markup
 
 @bot.message_handler(commands=['start'])
 def start(m):
-    db_query("INSERT OR IGNORE INTO users VALUES (?, ?, 0, 0, 0, NULL, 'Дар Shefcoin Super-App')", 
-             (m.from_user.id, m.from_user.first_name))
+    uid = m.from_user.id
+    name = m.from_user.first_name
     
-    welcome_text = (f"🚀 **Shefcoin OS v14.0**\n\n"
-                    f"🔥 Онлайн: {random.randint(50, 150)} нафар\n"
-                    f"✅ Системаи верификатсияшуда фаъол аст.\n\n"
-                    f"Хуш омадед, {m.from_user.first_name}!")
-    bot.send_message(m.chat.id, welcome_text, reply_markup=main_markup(m.from_user.id), parse_mode='Markdown')
-
-# --- 🎧 ДАСТГИРИИ ЗИНА (GHOST MODERATOR) ---
-@bot.message_handler(func=lambda m: m.text == '🎧 Дастгирии Зинда 🛡')
-def support_gate(m):
-    text = ("🛡 **Маркази дастгирии Shefcoin**\n\n"
-            "👤 Модератор: *Онлайн* ✅\n"
-            "⏱ Вақти ҷавоб: ~2 дақиқа\n\n"
-            "Лутфан мушкилӣ ё саволи худро нависед:")
-    msg = bot.reply_to(m, text, parse_mode='Markdown')
-    bot.register_next_step_handler(msg, send_to_mod)
-
-def send_to_mod(m):
-    # Фиристодан ба ту (Админ)
-    bot.send_message(ADMIN_ID, f"📩 **ПАЁМИ НАВ БА МОДЕРАТОР:**\nID: `{m.from_user.id}`\nНом: {m.from_user.first_name}\n\nМатн: {m.text}\n\n*(Reply кунед барои ҷавоб)*", parse_mode='Markdown')
-    bot.reply_to(m, "✅ **Фиристода шуд!** Модератор ҳозир паёми шуморо мехонад...")
-
-# --- ⚡️ ҶАВОБИ МОДЕРАТОР (REPLY SYSTEM) ---
-@bot.message_handler(func=lambda m: m.reply_to_message is not None and m.from_user.id == ADMIN_ID)
-def mod_reply(m):
-    try:
-        # Ёфтани ID-и корбар аз матни паёми қаблӣ
-        u_id = int(m.reply_to_message.text.split('ID: ')[1].split('\n')[0].replace('`', ''))
+    user = db_query("SELECT internal_number FROM users WHERE id=?", (uid,))
+    
+    if not user:
+        last_num = db_query("SELECT MAX(internal_number) FROM users")[0][0]
+        new_num = 1 if last_num is None else last_num + 1
+        if uid == ADMIN_ID: new_num = 1
         
-        # Эффекти "Typing" дар чати корбар
-        bot.send_chat_action(u_id, 'typing')
-        time.sleep(2) # Каме таваққуф барои боварӣ
-        
-        reply_text = f"🛡 **Official Support Team** ✅\n\n{m.text}"
-        bot.send_message(u_id, reply_text)
-        bot.reply_to(m, "✅ Ҷавоби модератор расонида шуд!")
-    except:
-        bot.reply_to(m, "❌ Хато! Танҳо ба паёмҳои Дастгирӣ 'Reply' кунед.")
+        db_query("INSERT INTO users (id, name, internal_number, badge) VALUES (?, ?, ?, ?)", 
+                 (uid, name, new_num, "👑 SHEF" if uid == ADMIN_ID else ""))
+        current_num = new_num
+    else:
+        current_num = user[0][0]
 
-# --- 👑 VIP ЗИНАҲО БО АСЪОР ---
-@bot.message_handler(func=lambda m: m.text == '👑 VIP Зинаҳо')
-def vip_details(m):
-    text = ("🏆 **Нақшаҳои Премиум:**\n\n"
-            "🥉 Silver: 30 TJS / 250 RUB / 3 USD\n"
-            "🥈 Gold: 60 TJS / 500 RUB / 6 USD\n"
-            "🥇 Platinum: 120 TJS / 1000 RUB / 12 USD\n\n"
-            "💎 Хариди VIP = VPN-и доимӣ + AI-и пурқувват.")
-    bot.reply_to(m, text)
+    formatted_id = f"ID-{str(current_num).zfill(6)}"
+    bot.send_message(m.chat.id, f"🛰 **SHEFCOIN v30.0**\n\n🆔 Рақами махфии шумо: `{formatted_id}`\n\nХуш омадед ба Империяи махфӣ!", reply_markup=main_menu(), parse_mode='Markdown')
 
-# --- AI GEMINI (GHOST MODE) ---
-@bot.message_handler(func=lambda m: True)
-def ai_brain(m):
-    if m.text in ['👤 Профили Ман', '💬 Чатҳо', '🎧 Дастгирии Зинда 🛡']: return
-    think = bot.reply_to(m, "🧠 *Фикр...*")
-    try:
-        res = model.generate_content(m.text)
-        bot.edit_message_text(res.text, m.chat.id, think.message_id)
-    except:
-        bot.edit_message_text("❌ Хато", m.chat.id, think.message_id)
+# --- ⚙️ ТАНЗИМОТ ВА НЕСТ КАРДАН ---
+@bot.message_handler(func=lambda m: m.text == '⚙️ Танзимот')
+def settings(m):
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("❌ Нест кардани Профил", callback_data="delete_profile"))
+    bot.send_message(m.chat.id, "⚙️ **Танзимоти профил:**\n\nОгоҳӣ: Агар профилро нест кунед, ҳамаи холҳо ва ID-и шумо абадӣ тоза мешаванд.", reply_markup=markup, parse_mode='Markdown')
 
-if __name__ == '__main__':
-    threading.Thread(target=lambda: bot.infinity_polling()).start()
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+@bot.callback_query_handler(func=lambda call: call.data == "delete_profile")
+def delete_confirm(call):
+    uid = call.from_user.id
+    db_query("DELETE FROM users WHERE id=?", (uid,))
+    bot.answer_callback_query(call.id, "🗑 Профили шумо нест карда шуд!", show_alert=True)
+    bot.send_message(call.message.chat.id, "🚪 Шумо Империяро тарк кард ва ҳама чиз сӯхт. Барои аз нав сар кардан /start-ро пахш кунед.")
+
+# --- 🏆 РЕЙТИНГ (МАХФӢ) ---
+@bot.message_handler(func=lambda m: m.text == '🏆 Рейтинг')
+def leaderboard(m):
+    # Дар ин ҷо internal_number-ро нишон намедиҳем, то махфӣ монад
+    users = db_query("SELECT name, points, badge FROM users ORDER BY points DESC LIMIT 10")
+    text = "🏆 **ТОП-10 МАЙНЕРОНИ МАХФӢ:**\n\n"
+    for i, u in enumerate(users, 1):
+        text += f"{i}. {u[2]} {u[0]} — `{u[1]:.2f} хол` \n"
+    bot.send_message(m.chat.id, text, parse_mode='Markdown')
+
+# --- 💬 ДИГАР ФУНКСИЯҲО ---
+@bot.message_handler(func=lambda m: m.text in ['🏦 Сандуқ', '🎒 Инвентар', '💬 Чат-Рулёт'])
+def handle_all(m):
+    uid = m.from_user.id
+    if m.text == '🏦 Сандуқ':
+        res = db_query("SELECT balance, vault FROM users WHERE id=?", (uid,))
+        bot.send_message(m.chat.id, f"🏦 Сандуқи шумо:\n💰 Баланс: {res[0][0]} TJS\n🔒 Маҳфуз: {res[0][1]} TJS")
+    elif m.text == '🎒 Инвентар':
+        res = db_query("SELECT inventory FROM users WHERE id=?", (uid,))
+        bot.send_message(m.chat.id, f"🎒 Инвентар: {res[0][0] if res[0][0] else 'Холӣ'}")
+    elif m.text == '💬 Чат-Рулёт':
+        bot.send_message(m.chat.id, "🔍 Ҷустуҷӯи ҳамсӯҳбати махфӣ...")
+
+bot.infinity_polling()
