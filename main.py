@@ -1,23 +1,13 @@
+from flask import Flask, render_template
 import os
-import telebot
-import google.generativeai as genai
 
-TOKEN = os.getenv('TELEGRAM_TOKEN')
-API_KEY = os.getenv('GEMINI_API_KEY')
+app = Flask(__name__)
 
-genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
-bot = telebot.TeleBot(TOKEN)
+@app.route('/')
+def index():
+    # Ин сатр файли index.html-ро меҷӯяд
+    return render_template('index.html')
 
-# Ин сатр хатои Webhook-ро автоматӣ тоза мекунад
-bot.remove_webhook()
-
-@bot.message_handler(func=lambda message: True)
-def chat(message):
-    try:
-        res = model.generate_content(f"Ту ёрдамчии тоҷик ҳастӣ: {message.text}")
-        bot.reply_to(message, res.text)
-    except Exception as e:
-        print(f"Хатогӣ: {e}")
-
-bot.infinity_polling()
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
