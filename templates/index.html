@@ -1,117 +1,37 @@
 <!DOCTYPE html>
-<html lang="tg">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shefcoin AI - Super App</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #0088cc;
-            --dark-bg: #0f0f12;
-            --card-bg: #1a1a20;
-            --text: #ffffff;
-            --accent: #00d2ff;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--dark-bg);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .container {
-            text-align: center;
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid #333;
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .logo {
-            font-size: 60px;
-            color: var(--primary);
-            margin-bottom: 20px;
-            animation: pulse 2s infinite;
-        }
-
-        h1 {
-            margin: 10px 0;
-            font-size: 28px;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        p {
-            color: #aaa;
-            line-height: 1.6;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 8px 20px;
-            background: rgba(0, 255, 0, 0.1);
-            color: #00ff00;
-            border-radius: 20px;
-            font-weight: bold;
-            margin: 20px 0;
-            border: 1px solid rgba(0, 255, 0, 0.3);
-        }
-
-        .btn {
-            display: block;
-            text-decoration: none;
-            background: var(--primary);
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            font-weight: bold;
-            transition: 0.3s;
-            margin-top: 20px;
-        }
-
-        .btn:hover {
-            background: var(--accent);
-            transform: translateY(-2px);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
+        body { background: #000; color: #f1c40f; font-family: sans-serif; text-align: center; }
+        .id-badge { background: #111; padding: 10px; border-radius: 10px; display: inline-block; margin-top: 20px; border: 1px solid #333; }
+        .diamond { width: 200px; margin-top: 50px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="logo">
-            <i class="fas fa-robot"></i>
-        </div>
-        <h1>Shefcoin AI</h1>
-        <p>Системаи интеллектуалии шумо дар Телеграм ва Веб.</p>
-        
-        <div class="status-badge">
-            <i class="fas fa-check-circle"></i> СИСТЕМА ФАЪОЛ АСТ
-        </div>
+<div class="id-badge">🆔 ШУМО: <span id="my-id">ID-000001</span></div>
 
-        <p style="font-size: 14px;">Ҳамаи функсияҳо (Профил, Баланс, Gemini AI) ба кор дароварда шуданд.</p>
-        
-        <a href="https://t.me/Shefcoin_Ai_bot" class="btn">
-            <i class="fab fa-telegram-plane"></i> ГУЗАШТАН БА БОТ
-        </a>
-    </div>
+<div style="margin-top: 40px;">
+    <h1 id="score">0.00</h1>
+    <p>КРИСТАЛҲОИ МАЙНИНГ</p>
+</div>
+
+<img src="https://img.icons8.com/clouds/200/diamond.png" class="diamond" onclick="mine()">
+
+
+
+<script>
+    let s = 0;
+    function mine() {
+        s += 0.05;
+        document.getElementById('score').innerText = s.toFixed(2);
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+        }
+    }
+</script>
 
 </body>
 </html>
