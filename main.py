@@ -6,7 +6,7 @@ from flask import Flask, render_template
 
 # Танзимоти калидҳо аз Render Environment
 TOKEN = os.environ.get('8780142915:AAE7lMwsS4O1S5V2MhOmn2JQ3Nf_iZDifcQ')
-API_KEY = os.environ.get('GEMINI_API_KEY')
+API_KEY = os.environ.get('AIzaSyDMA9WC1p8CwG3ABNcfPHLSpM_5AtAAFjk')
 
 bot = telebot.TeleBot(TOKEN)
 genai.configure(api_key=API_KEY)
