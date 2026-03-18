@@ -4,9 +4,9 @@ import telebot
 import google.generativeai as genai
 from flask import Flask, render_template
 
-# Танзимоти калидҳо аз Render Environment
-TOKEN = os.environ.get('TELEGRAM_TOKEN')
-API_KEY = os.environ.get('GEMINI_API_KEY')
+# Калидҳои ту
+TOKEN = '8780142915:AAE7lMwsS4O1S5V2MhOmn2JQ3Nf_iZDifcQ'
+API_KEY = 'AIzaSyDMA9WC1p8CwG3ABNcfPHLSpM_5AtAAFjk'
 
 bot = telebot.TeleBot(TOKEN)
 genai.configure(api_key=API_KEY)
@@ -19,39 +19,44 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-# --- TELEGRAM BOT HANDLERS ---
+# --- МЕНЮҲОИ ТЕЛЕГРАМ ---
+
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.reply_to(message, "📱 Хуш омадед ба Super-App! Ҳамаи тугмаҳо фаъоланд.")
+    markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add('👤 Профил', '💰 Баланс', '👨‍💻 IT Expert')
+    markup.add('🔐 Амният', '🎧 Дастгирӣ')
+    bot.reply_to(message, "📱 Хуш омадед ба Shefcoin Super-App!\nТугмаеро интихоб кунед ё ба AI савол диҳед:", reply_markup=markup)
 
-@bot.message_handler(commands=['profile'])
+@bot.message_handler(func=lambda message: message.text == '👤 Профил' or message.text == '/profile')
 def profile(message):
-    bot.reply_to(message, f"👤 Кабинети шахсӣ\n🆔 ID: {message.from_user.id}\n💰 Баланс: 0.00 TJS")
+    text = (f"👤 **Кабинети шахсӣ**\n\n🆔 ID: `{message.from_user.id}`\n👤 Ном: {message.from_user.first_name}\n💰 Баланс: 0.00 TJS\n🌟 Статус: Корбар")
+    bot.reply_to(message, text, parse_mode='Markdown')
 
-@bot.message_handler(commands=['top_up'])
-def top_up(message):
-    bot.reply_to(message, "💰 Пур кардани баланс: Усули пардохтро интихоб кунед.")
+@bot.message_handler(func=lambda message: message.text == '💰 Баланс' or message.text == '/top_up')
+def balance(message):
+    bot.reply_to(message, "💰 **Пур кардани баланс**\n\nБарои гузаронидани маблағ ба @saidjun нависед.")
 
-@bot.message_handler(commands=['wallet'])
-def wallet(message):
-    bot.reply_to(message, "💳 Ҳамёни криптои шумо ҳоло пайваст нест.")
-
-@bot.message_handler(commands=['it_expert'])
+@bot.message_handler(func=lambda message: message.text == '👨‍💻 IT Expert' or message.text == '/it_expert')
 def it_expert(message):
-    bot.reply_to(message, "👨‍💻 IT Expert AI омода аст. Саволи худро нависед.")
+    bot.reply_to(message, "👨‍💻 **IT Expert AI**\n\nМан тайёрам ба саволҳои барномасозии шумо ҷавоб диҳам. Нависед!")
 
-@bot.message_handler(commands=['support'])
+@bot.message_handler(func=lambda message: message.text == '🔐 Амният')
+def security(message):
+    bot.reply_to(message, "🔐 **Амният**\n\nҲисоби шумо таҳти ҳимояи Shefcoin AI мебошад.")
+
+@bot.message_handler(func=lambda message: message.text == '🎧 Дастгирӣ')
 def support(message):
-    bot.reply_to(message, "🎧 Алоқа бо Админ: @saidjun")
+    bot.reply_to(message, "🎧 **Маркази дастгирӣ**\n\nАдмин: @saidjun")
 
-# AI Response for other messages
+# ҶАВОБИ AI БА ПАЁМҲОИ ОДДӢ
 @bot.message_handler(func=lambda message: True)
-def ai_chat(message):
+def ai_response(message):
     try:
         response = model.generate_content(message.text)
         bot.reply_to(message, response.text)
-    except:
-        bot.reply_to(message, "Бубахшед, хатогӣ дар AI.")
+    except Exception as e:
+        bot.reply_to(message, "❌ Хатогӣ дар AI. Лутфан API Key-ро санҷед.")
 
 def run_bot():
     bot.infinity_polling()
