@@ -497,3 +497,22 @@ for file_name in os.listdir(source_dir):
             print(f"3. Скип: '{file_name}' аллакай дар архив ҳаст.")
 
 print("\n--- Ҳамаи амалиётҳо бо муваффақият иҷро шуданд! ---")
+import os
+import shutil
+
+# Танзимоти асосӣ
+target_dir = "архив"
+os.makedirs(target_dir, exist_ok=True)
+
+# Рӯйхати файлҳоро месанҷем
+for file_name in os.listdir("."):
+    # Шарт: танҳо .txt бошад ВА файлҳои муҳими системӣ набошад
+    if file_name.endswith(".txt") and file_name not in ["requirements.txt", "runtime.txt"]:
+        source_path = file_name
+        target_path = os.path.join(target_dir, file_name)
+
+        if not os.path.exists(target_path):
+            shutil.move(source_path, target_path)
+            print(f"Кӯчонида шуд: {file_name}")
+
+print("Ҳамааш тайёр! Акнун метавонед бо хотири ҷамъ хоб кунед.")
