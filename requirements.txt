@@ -1,3 +1,6 @@
-
 pyTelegramBotAPI
 flask
+requests
+pillow
+sqlite3
+gunicorn
