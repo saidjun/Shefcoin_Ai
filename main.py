@@ -126,3 +126,34 @@ def admin_main(call):
 def admin_stats(call):
     # Дар инҷо баъдтар логикаи ҳисоб кардани одамонро аз база илова мекунем
     bot.send_message(call.message.chat.id, "👥 **ОМОР:**\n\nКорбарони умумӣ: 1\nБотҳои сохташуда: 0\nФоидаи имрӯза: 0 TJS")
+# --- МОДУЛИ РЕФЕРАЛӢ (REFERRAL SYSTEM) ---
+@bot.callback_query_handler(func=lambda call: call.data == "referral")
+def referral_system(call):
+    reflink = f"https://t.me/{(bot.get_me()).username}?start={call.from_user.id}"
+    text = (
+        "👥 **ПРОГРАММАИ РЕФЕРАЛӢ:**\n\n"
+        "Дӯстони худро даъват кунед ва 10% аз харидҳои онҳоро гиред!\n\n"
+        f"🔗 Пайванди шумо:\n`{reflink}`\n\n"
+        "Сатҳи шумо: Бронза 🥉\n"
+        "Даъватшудагон: 0 одам"
+    )
+    bot.edit_message_text(text, call.message.chat.id, call.message.message_id, 
+                          reply_markup=main_keyboard(), parse_mode="Markdown")
+
+# --- МОДУЛИ МАҒОЗА (SHOP MODULE) ---
+@bot.callback_query_handler(func=lambda call: call.data == "shop")
+def shop_module(call):
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    markup.add(
+        types.InlineKeyboardButton("🤖 Харидани Боти Тайёр", callback_data="buy_bot_ready"),
+        types.InlineKeyboardButton("🔑 Харидани Ключи VPN", callback_data="buy_vpn_key"),
+        types.InlineKeyboardButton("🔙 Ба қафо", callback_data="back_to_main")
+    )
+    bot.edit_message_text("🛒 **МАҒОЗАИ SHEFCOIN:**\n\nБеҳтарин хизматрасониҳои автоматиро интихоб кунед.", 
+                          call.message.chat.id, call.message.message_id, reply_markup=markup)
+
+# --- ФУНКСИЯИ БА ҚАФО (BACK TO MAIN) ---
+@bot.callback_query_handler(func=lambda call: call.data == "back_to_main")
+def back_home(call):
+    bot.edit_message_text(f"💎 **Хуш омадед, Шеф {call.from_user.first_name}!**\n\nМенюи асосӣ омода аст:", 
+                          call.message.chat.id, call.message.message_id, reply_markup=main_keyboard())
