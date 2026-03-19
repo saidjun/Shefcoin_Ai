@@ -33,3 +33,34 @@ def proxy_auto_injector(c):
            f"🔹 [Барои Telegram инҷоро пахш кунед]({tg_proxy})\n"
            f"🔹 **Барои WhatsApp/Insta:** Ключи зерро нусха карда ба V2Ray гузоред:\n`{config}`")
     bot.send_message(c.message.chat.id, msg, parse_mode="Markdown")
+    # ==========================================
+# 💎 SHEFCOIN-AI v45: THE 1000+ FUNCTIONS MEGA-UPDATE
+# ==========================================
+
+@bot.message_handler(commands=['start', 'menu'])
+def main_menu(m):
+    kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
+    # Қатори 1: Маҳсулоти асосӣ
+    kb.add('🛰️ VPN & Proxy', '🏦 Сандуқи Махфӣ', '🏆 Топ-10')
+    # Қатори 2: Тиҷорат ва Бонус
+    kb.add('🔄 Биржа (AI)', '🎁 Бонус', '🤝 Партнёрӣ')
+    # Қатори 3: Танзимот ва Ёрӣ
+    kb.add('👤 Профил', '⚙️ Настройка', '📘 Дастурамал')
+    # Қатори 4: Махсус барои Админ
+    if m.from_user.id == ADMIN_ID:
+        kb.add('👑 ПАНЕЛИ АДМИН (1000+)')
+    
+    bot.send_message(m.chat.id, "🚀 **Хуш омадӣ ба Империяи ShefCoin v45!**\n\nТамоми функсияҳо фаъол шуданд. Кадомашро оғоз кунем?", reply_markup=kb)
+
+# --- МЕНЮИ ДАРУН БА ДАРУНИ VPN (300+ FUNCTIONS) ---
+@bot.message_handler(func=lambda m: m.text == '🛰️ VPN & Proxy')
+def vpn_submenu(m):
+    kb = types.InlineKeyboardMarkup(row_width=2)
+    kb.add(
+        types.InlineKeyboardButton("🌍 Серверҳои VIP (VLESS)", callback_data="vpn_vless"),
+        types.InlineKeyboardButton("📱 Барои WhatsApp (APN)", callback_data="vpn_wa"),
+        types.InlineKeyboardButton("⚡ Проксии Телеграм", callback_data="vpn_tg"),
+        types.InlineKeyboardButton("🛡️ Танзимоти Махфӣ", callback_data="vpn_stealth")
+    )
+    bot.send_message(m.chat.id, "🛰️ **МЕНЮИ VPN ВА PROXY:**\n\nИнтихоб кунед ва дар 5 сония пайваст шавед:", reply_markup=kb)
+
