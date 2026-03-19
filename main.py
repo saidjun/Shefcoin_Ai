@@ -199,5 +199,15 @@ def vpn_proxy_engine(call):
         types.InlineKeyboardButton("🛰️ Multi-Node Server", callback_data="nodes_active")
     )
     bot.edit_message_text("🛰️ **МЕНЮИ VPN ВА PROXY (300+ FUNCTIONS):**\n\nҲамаи серверҳо дар ҳолати ACTIVE мебошанд.", call.message.chat.id, call.message.message_id, reply_markup=kb)
+    
+# --- VIRTUAL FOLDER: STEALTH FINANCE ---
+def finance_stealth_engine(call):
+    kb = types.InlineKeyboardMarkup(row_width=1)
+    kb.add(
+        types.InlineKeyboardButton("💳 Реквизитҳои Махфӣ (IBAN/QR)", callback_data="show_stealth_pay"),
+        types.InlineKeyboardButton("📊 Ҳисоботи 70/30 (Partner Profit)", callback_data="partner_stats"),
+        types.InlineKeyboardButton("🔍 Сканери OCR (Check Verify)", callback_data="ocr_scanner")
+    )
+    bot.edit_message_text("🏦 **МЕНЮИ МОЛИЯИ МАХФӢ (300+ FUNCTIONS):**\n\nТамоми транзаксияҳо рамзгузорӣ шудаанд.", call.message.chat.id, call.message.message_id, reply_markup=kb)
 
 
