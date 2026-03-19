@@ -449,5 +449,18 @@ if __name__ == "__main__":
     t.start()
     print("✅ СЕРВЕР ВА БОТ БО МУВАФФАҚИЯТ ОҒОЗ ШУД!")
     bot.infinity_polling()
+    
+# --- БАХШИ КОНСТРУКТОР (СОХТАНИ БОТ) ---
+@bot.callback_query_handler(func=lambda call: call.data == "create_bot")
+def create_bot_logic(call):
+    msg = bot.send_message(call.message.chat.id, "🤖 **ХУШ ОМАДЕД БА КОНСТРУКТОР!**\n\nЛутфан Токени боти худро аз @BotFather нусхабардорӣ карда, ба инҷо фиристед:")
+    bot.register_next_step_handler(msg, save_user_token)
+
+def save_user_token(message):
+    user_token = message.text
+    if ":" in user_token and len(user_token) > 20:
+        bot.send_message(message.chat.id, f"✅ **ТОКЕН ҚАБУЛ ШУД!**\n\nБоти шумо дар навбат аст. Мо онро дар сервери Render-и худ мепайвандем.\n\nID-и боти шумо: #user_{message.from_user.id}")
+    else:
+        bot.send_message(message.chat.id, "❌ **ХАТО!** Токен нодуруст аст. Дубора кӯшиш кунед.")
 
 
