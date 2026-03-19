@@ -130,6 +130,58 @@ def global_button_fix(call):
         
     # Тасдиқи қабул (барои он ки тугма "часпида" намонад)
     bot.answer_callback_query(call.id)
+# ==========================================
+# 🌐 SHEFCOIN-AI: SERVER DEPLOY & BUTTON FIX
+# ==========================================
+
+import os
+
+# 1. ТАНЗИМОТИ СЕРВЕР (RENDER/VPS)
+PORT = int(os.environ.get('PORT', 5000))
+SERVER_URL = "https://shefcoin-ai.onrender.com" # Сайти ту
+
+# 2. ИДОРАКУНИИ ТУГМАҲОИ "ДАРУН БА ДАРУН" (1000+ FUNCTIONS)
+@bot.callback_query_handler(func=lambda call: True)
+def master_callback_handler(call):
+    # ID 000001: Танҳо барои Шеф (6967256070)
+    if call.from_user.id == 6967256070:
+        role = "👑 EMPEROR"
+    else:
+        role = "USER"
+
+    # МАНТИҚИ КУШОДАШАВИИ МЕНЮҲО
+    try:
+        if call.data == "vpn_menu":
+            # Функсияҳои VPN-ро аз модул нишон медиҳад
+            show_vpn_options(call.message)
+        elif call.data == "proxy_menu":
+            # Функсияҳои Прокси-ро кушода мекунад
+            show_proxy_options(call.message)
+        elif call.data == "finance_menu":
+            # Реквизитҳои махфии QR/Card
+            show_stealth_finance(call.message)
+        elif call.data == "admin_v45":
+            # Панели идораи 1000 функсия
+            show_admin_god_mode(call.message)
+            
+        # Ҳатман ҷавоб диҳед, то тугма "часпида" намонад
+        bot.answer_callback_query(call.id, text="🚀 Иҷро шуд!")
+        
+    except Exception as e:
+        bot.answer_callback_query(call.id, text="⚠️ Серверро пайваст кунед!")
+
+# 3. БАРҚАРОРСОЗИИ АКАУНТИ ШЕФ (000001)
+def sync_shef_account():
+    # Ин функсия ID-и туро дар базаи сервер ҳамчун рақами 1 қайд мекунад
+    db.verify_admin(6967256070)
+    print("💎 Акаунти 000001 бо сервер синхронӣ шуд.")
+
+# ОҒОЗИ СЕРВЕР (WEBHOOK MODE)
+if __name__ == "__main__":
+    sync_shef_account()
+    # Агар дар сервер бошад, Webhook-ро фаъол мекунад
+    bot.remove_webhook()
+    bot.infinity_polling(timeout=10, long_polling_timeout=5)
 
 # 3. ЧАРО СЕРВЕР ДАРКОР АСТ?
 def server_status_check():
