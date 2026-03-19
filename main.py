@@ -178,3 +178,13 @@ def admin_main(call):
 def admin_stats(call):
     # Дар инҷо баъдтар логикаи ҳисоб кардани одамонро аз база илова мекунем
     bot.send_message(call.message.chat.id, "👥 **ОМОР:**\n\nКорбарони умумӣ: 1\nБотҳои сохташуда: 0\nФоидаи имрӯза: 0 TJS")
+# --- ИН ҚИСМ ҲАМЕША ДАР ОХИРИ ФАЙЛИ MAIN.PY МЕШАВАД ---
+if __name__ == "__main__":
+    # Сар додани Flask дар як "ришта" (thread), то ки Render ботро накушад
+    t = Thread(target=run)
+    t.start()
+    
+    print("🚀 Shefcoin AI бо муваффақият сар шуд!")
+    
+    # Ин сатр бояд САФИ ОХИРИНИ файли ту бошад
+    bot.infinity_polling()
