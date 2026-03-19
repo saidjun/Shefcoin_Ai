@@ -323,3 +323,55 @@ def vpn_delivery(call):
 def proxy_delivery(call):
     proxy_link = "https://t.me/proxy?server=1.1.1.1&port=443&secret=ee00000000000000000000000000000000676f6f676c652e636f6d"
     bot.send_message(call.message.chat.id, f"🛡 **MTPROTO PROXY БАРОИ ТЕЛЕГРАМ:**\n\nБарои истифода пахш кунед:\n{proxy_link}")
+    __name__ == "__main__":
+    import pyqrcode
+import io
+from telebot import types
+
+# --- МОДУЛИ ПАРДОХТИ МАХФӢ (PRIVATE PAYMENT) ---
+@bot.callback_query_handler(func=lambda call: call.data == "wallet_topup")
+def payment_method_choice(call):
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    markup.add(
+        types.InlineKeyboardButton("💳 Alif / Dushanbe City (QR)", callback_data="pay_alif"),
+        types.InlineKeyboardButton("🪙 Crypto (USDT)", callback_data="pay_crypto_usdt"),
+        types.InlineKeyboardButton("🔙 Ба қафо", callback_data="wallet")
+    )
+    bot.edit_message_text("💰 **УСУЛИ ПАРДОХТРО ИНТИХОБ КУНЕД:**\n\nБаъди интихоб, система ба шумо QR-коди махфиро мефиристад.", 
+                          call.message.chat.id, call.message.message_id, reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: call.data == "pay_alif")
+def generate_payment_qr(call):
+    # Рақами ҳамёни ту (ИНРО ИВАЗ КУН)
+    my_wallet = "992900000000" 
+    
+    # Сохтани матни QR (Масалан барои Алиф ё суратҳисоб)
+    payment_data = f"https://alif.tj/pay/{my_wallet}"
+    
+    # Генератсияи QR-код дар хотира (Memory)
+    qr = pyqrcode.create(payment_data)
+    buffer = io.BytesIO()
+    qr.png(buffer, scale=8)
+    buffer.seek(0)
+    
+    caption_text = (
+        "✅ **QR-КОДИ ПАРДОХТ ОМОДА ШУД**\n\n"
+        "1. Ин кодро скриншот кунед.\n"
+        "2. Дар замимаи **Alif Mob** ё **DC Next** онро сканер кунед.\n"
+        "3. Маблағро гузаронед.\n\n"
+        "⚠️ **МУҲИМ:** Баъди пардохт чекро ба @admin_shef фиристед."
+    )
+    
+    bot.delete_message(call.message.chat.id, call.message.message_id)
+    bot.send_photo(call.message.chat.id, buffer, caption=caption_text, parse_mode="Markdown")
+
+# --- МОДУЛИ ТАСДИҚИ ПАРДОХТ (RECEIPT CHECKER) ---
+@bot.message_handler(content_types=['photo'])
+def handle_receipt(message):
+    if message.caption and ("чек" in message.caption.lower() or "пардохт" in message.caption.lower()):
+        bot.forward_message(ADMIN_ID, message.chat.id, message.message_id)
+        bot.reply_to(message, "⏳ **ЧЕКИ ШУМО ҚАБУЛ ШУД!**\nАдмин онро тафтиш мекунад ва балансатонро пур мекунад.")
+    else:
+        # Агар танҳо расми оддӣ бошад, ҳеҷ кор намекунад
+        pass
+
