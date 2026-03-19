@@ -394,8 +394,38 @@ print(f"Папкаи '{directory}' омода аст!")
 from pathlib import Path
 
 # Папкаро муайян мекунем
+import os
+
+filename = "hisobot.txt"
+
+# Санҷиш: Оё файл аллакай ҳаст?
+if not os.path.exists(filename):
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write("Ин аввалин сатри файл аст.\n")
+    print(f"Файли '{filename}' сохта шуд.")
+else:
+    print(f"Диққат! Файли '{filename}' аллакай мавҷуд аст. Мо онро иваз намекунем.")
+
 Path("папкаи_нав").mkdir(parents=True, exist_ok=True)
 
 print("Ҳамааш даст ёфт!")
 import os
 os.system("mkdir -p папкаи_нав")
+if not os.path.exists
+import os
+
+folder_name = "arshiv"
+file_path = os.path.join(folder_name, "data.log")
+
+# 1. Аввал папкаро месозем (агар набошад)
+if not os.path.exists(folder_name):
+    os.makedirs(folder_name)
+    print(f"Папкаи '{folder_name}' сохта шуд.")
+
+# 2. Баъд файлро дар дохили он месозем
+if not os.path.exists(file_path):
+    with open(file_path, "w") as f:
+        f.write("Log started...\n")
+    print(f"Файли '{file_path}' сохта шуд.")
+else:
+    print("Файл аллакай ҳаст, чизе иваз нашуд.")
