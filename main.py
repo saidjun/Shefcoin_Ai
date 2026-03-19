@@ -209,5 +209,15 @@ def finance_stealth_engine(call):
         types.InlineKeyboardButton("🔍 Сканери OCR (Check Verify)", callback_data="ocr_scanner")
     )
     bot.edit_message_text("🏦 **МЕНЮИ МОЛИЯИ МАХФӢ (300+ FUNCTIONS):**\n\nТамоми транзаксияҳо рамзгузорӣ шудаанд.", call.message.chat.id, call.message.message_id, reply_markup=kb)
+    # --- VIRTUAL FOLDER: PARTNER & SECURITY ---
+def partner_security_engine(call):
+    kb = types.InlineKeyboardMarkup(row_width=2)
+    kb.add(
+        types.InlineKeyboardButton("🤝 Конструктори Ботҳо", callback_data="bot_builder"),
+        types.InlineKeyboardButton("🛡️ Амнияти Профил (3-Step)", callback_data="profile_safe_delete"),
+        types.InlineKeyboardButton("🚀 Turbo-Speed (VIP)", callback_data="vip_turbo")
+    )
+    bot.edit_message_text("🤖 **МЕНЮИ ПАРТНЁР ВА АМНИЯТ (400+ FUNCTIONS):**\n\nИдораи мутлақи Империя дар ин ҷост.", call.message.chat.id, call.message.message_id, reply_markup=kb)
+
 
 
