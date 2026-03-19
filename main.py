@@ -281,6 +281,27 @@ if __name__ == "__main__":
     keep_alive() # Сайт фаъол мешавад
     imperial_auto_start()
     bot.infinity_polling()
+# --- 🛰️ МОДУЛИ VPN (ЛОГИКАИ ТУГМАҲО) ---
+def vpn_proxy_engine(call):
+    kb = telebot.types.InlineKeyboardMarkup(row_width=1)
+    kb.add(
+        telebot.types.InlineKeyboardButton("🌍 Гирифтани V2Ray (Бепул)", callback_data="get_v2ray"),
+        telebot.types.InlineKeyboardButton("⚡ Proxy барои Telegram", callback_data="get_tg_proxy"),
+        telebot.types.InlineKeyboardButton("🔙 Ба қафо", callback_data="vpn_main")
+    )
+    bot.edit_message_text("🛰️ **МЕНЮИ VPN ВА PROXY:**\n\nИнҷо метавонед танзимоти суръати баландро дастрас кунед.", 
+                          call.message.chat.id, call.message.message_id, reply_markup=kb)
+
+# --- 🏦 МОДУЛИ МОЛИЯ (САНДУҚ) ---
+def finance_stealth_engine(call):
+    kb = telebot.types.InlineKeyboardMarkup(row_width=2)
+    kb.add(
+        telebot.types.InlineKeyboardButton("💳 Пур кардан", callback_data="deposit"),
+        telebot.types.InlineKeyboardButton("📉 Хуруҷи пул", callback_data="withdraw"),
+        telebot.types.InlineKeyboardButton("🔙 Ба қафо", callback_data="vpn_main")
+    )
+    bot.edit_message_text("🏦 **САНДУҚИ ШЕФ:**\n\nБаланси шумо: 0.00 TJS\nҲолати суратҳисоб: Фаъол ✅", 
+                          call.message.chat.id, call.message.message_id, reply_markup=kb)
 
 
 
