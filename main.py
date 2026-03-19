@@ -429,3 +429,71 @@ if not os.path.exists(file_path):
     print(f"Файли '{file_path}' сохта шуд.")
 else:
     print("Файл аллакай ҳаст, чизе иваз нашуд.")
+import os
+import shutil
+
+# 1. Номи папкаҳоро муайян мекунем
+source_dir = "."        # Папкаи ҳозира (ки дар он файлҳо ҳастанд)
+target_dir = "архив"    # Папкае, ки файлҳоро ба он мегузаронем
+
+# 2. Сохтани папкаи нав (Бехатар: агар бошад, хато намекунад)
+os.makedirs(target_dir, exist_ok=True)
+
+# 3. Рӯйхати ҳамаи файлҳоро мегирем
+files = os.listdir(source_dir)
+
+for file_name in files:
+    # Танҳо файлҳои матниро (.txt) интихоб мекунем
+    if file_name.endswith(".txt"):
+        source_path = os.path.join(source_dir, file_name)
+        target_path = os.path.join(target_dir, file_name)
+
+        # 4. Санҷиши ниҳоӣ: Агар файл аллакай дар архив бошад, онро пок намекунем
+        if not os.path.exists(target_path):
+            shutil.move(source_path, target_path)
+            print(f"Файли '{file_name}' ба папкаи '{target_dir}' гузаронида шуд.")
+        else:
+            print(f"Диққат! '{file_name}' аллакай дар архив ҳаст. Гузаронида нашуд.")
+
+print("\n--- Амалиёт бо муваффақият анҷом ёфт! ---")
+import os
+import shutil
+from pathlib import Path
+
+# --- 1. СОХТАНИ ПАПКАИ БЕХАТАР (Мисли mkdir -p) ---
+folder_name = "папкаи_нав"
+os.makedirs(folder_name, exist_ok=True)
+print(f"1. Папкаи '{folder_name}' омода аст.")
+
+
+# --- 2. СОХТАНИ ФАЙЛ ТАНҲО АГАР ОН НАБОШАД ---
+file_path = os.path.join(folder_name, "hisobot.txt")
+
+if not os.path.exists(file_path):
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write("Ин сатри аввали файл аст.\n")
+    print(f"2. Файли '{file_path}' сохта шуд.")
+else:
+    print(f"2. Диққат! Файл аллакай ҳаст, онро иваз накардем.")
+
+
+# --- 3. АВТОМАТИЗАЦИЯ: КӮЧОНИДАНИ ФАЙЛҲО БА АРХИВ ---
+source_dir = "."        # Папкаи ҳозира
+target_dir = "архив"    # Папкаи таъинот
+
+os.makedirs(target_dir, exist_ok=True)
+
+# Рӯйхати файлҳоро месанҷем ва танҳо файлҳои .txt-ро мекӯчонем
+for file_name in os.listdir(source_dir):
+    if file_name.endswith(".txt") and file_name != "requirements.txt":
+        old_path = os.path.join(source_dir, file_name)
+        new_path = os.path.join(target_dir, file_name)
+
+        # Санҷиши дубора пеш аз кӯчонидан
+        if not os.path.exists(new_path):
+            shutil.move(old_path, new_path)
+            print(f"3. Файли '{file_name}' ба '{target_dir}' гузашт.")
+        else:
+            print(f"3. Скип: '{file_name}' аллакай дар архив ҳаст.")
+
+print("\n--- Ҳамаи амалиётҳо бо муваффақият иҷро шуданд! ---")
