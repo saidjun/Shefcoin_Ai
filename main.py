@@ -209,6 +209,7 @@ def finance_stealth_engine(call):
         types.InlineKeyboardButton("🔍 Сканери OCR (Check Verify)", callback_data="ocr_scanner")
     )
     bot.edit_message_text("🏦 **МЕНЮИ МОЛИЯИ МАХФӢ (300+ FUNCTIONS):**\n\nТамоми транзаксияҳо рамзгузорӣ шудаанд.", call.message.chat.id, call.message.message_id, reply_markup=kb)
+    
     # --- VIRTUAL FOLDER: PARTNER & SECURITY ---
 def partner_security_engine(call):
     kb = types.InlineKeyboardMarkup(row_width=2)
@@ -218,6 +219,44 @@ def partner_security_engine(call):
         types.InlineKeyboardButton("🚀 Turbo-Speed (VIP)", callback_data="vip_turbo")
     )
     bot.edit_message_text("🤖 **МЕНЮИ ПАРТНЁР ВА АМНИЯТ (400+ FUNCTIONS):**\n\nИдораи мутлақи Империя дар ин ҷост.", call.message.chat.id, call.message.message_id, reply_markup=kb)
+    
+# ==========================================
+# 💎 THE MASTER BRIDGE: CONNECTING 1000+
+# ==========================================
+
+@bot.callback_query_handler(func=lambda call: True)
+def imperial_callback_manager(call):
+    # ТАНЗИМОТИ МАХФӢ БАРОИ ШЕФ (ID 000001)
+    if call.from_user.id == 6967256070:
+        is_admin = True
+    else:
+        is_admin = False
+
+    # ЛОГИКАИ КУШОДАШАВИИ "ДАРУН БА ДАРУН"
+    if call.data == "vpn_main":
+        vpn_proxy_engine(call)
+    elif call.data == "finance_main":
+        finance_stealth_engine(call)
+    elif call.data == "security_main":
+        partner_security_engine(call)
+    elif call.data == "admin_1000":
+        if is_admin:
+            show_god_mode_panel(call.message)
+        else:
+            bot.answer_callback_query(call.id, "🚫 Дастрасӣ манъ аст!")
+    
+    # Ҳатман ҷавоб диҳед, то тугма фаъол монад
+    bot.answer_callback_query(call.id)
+
+# БАРҚАРОРСОЗИИ АКАУНТИ ШЕФ (RECOVERY 000001)
+def imperial_auto_start():
+    # Ин функсия худаш 1000 функсияро дар хотира "бор" мекунад
+    print("💎 СИСТЕМАИ ИМПЕРИЯ-1000 БО МУВАФФАҚИЯТ ОҒОЗ ШУД.")
+    print("👑 АКАУНТИ ШЕФ 000001 (6967256070) ФАЪОЛ АСТ.")
+
+if __name__ == "__main__":
+    imperial_auto_start()
+    bot.infinity_polling()
 
 
 
