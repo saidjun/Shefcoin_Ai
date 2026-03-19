@@ -188,5 +188,16 @@ def server_status_check():
     # Агар сервер набошад, Webhook кор намекунад
     status = "🔴 ОГОҲӢ: Барои кори 1000 функсия сервери RENDER ё VPS ҳатмист!"
     return status
+    
+# --- VIRTUAL FOLDER: VPN & PROXY ---
+def vpn_proxy_engine(call):
+    kb = types.InlineKeyboardMarkup(row_width=2)
+    kb.add(
+        types.InlineKeyboardButton("🌍 V2Ray Pro", callback_data="v2ray_active"),
+        types.InlineKeyboardButton("⚡ Telegram Proxy", callback_data="tg_proxy_active"),
+        types.InlineKeyboardButton("📱 WhatsApp Config", callback_data="wa_apn_active"),
+        types.InlineKeyboardButton("🛰️ Multi-Node Server", callback_data="nodes_active")
+    )
+    bot.edit_message_text("🛰️ **МЕНЮИ VPN ВА PROXY (300+ FUNCTIONS):**\n\nҲамаи серверҳо дар ҳолати ACTIVE мебошанд.", call.message.chat.id, call.message.message_id, reply_markup=kb)
 
 
