@@ -303,6 +303,64 @@ def finance_stealth_engine(call):
     bot.edit_message_text("🏦 **САНДУҚИ ШЕФ:**\n\nБаланси шумо: 0.00 TJS\nҲолати суратҳисоб: Фаъол ✅", 
                           call.message.chat.id, call.message.message_id, reply_markup=kb)
 
+import telebot
+import os
+from flask import Flask
+from threading import Thread
+
+# 👑 ТАНЗИМОТИ АСОСӢ
+TOKEN = os.environ.get('BOT_TOKEN') # Токен аз Render гирифта мешавад
+bot = telebot.TeleBot(TOKEN)
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Бот фаъол аст!"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+# 🛠 МЕНЮИ АСОСӢ
+def main_menu():
+    markup = telebot.types.InlineKeyboardMarkup(row_width=2)
+    markup.add(
+        telebot.types.InlineKeyboardButton("🛰 VPN", callback_data="vpn"),
+        telebot.types.InlineKeyboardButton("🏦 Сандуқ", callback_data="wallet"),
+        telebot.types.InlineKeyboardButton("👤 Профил", callback_data="profile"),
+        telebot.types.InlineKeyboardButton("🛡 Амният", callback_data="security"),
+        telebot.types.InlineKeyboardButton("📊 Биржа", callback_data="exchange"),
+        telebot.types.InlineKeyboardButton("🤖 AI Чат", callback_data="ai_chat")
+    )
+    return markup
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.send_message(message.chat.id, "💎 **Хуш омадед ба Империяи Shefcoin AI!**\n\nҲамаи функсияҳо дар зер дастрасанд:", reply_markup=main_menu())
+
+# ⚙️ ЛОГИКАИ ТУГМАҲО (ИНҶОРО ЗИНДА КАРДЕМ)
+@bot.callback_query_handler(func=lambda call: True)
+def handle_query(call):
+    if call.data == "vpn":
+        bot.edit_message_text("🛰 **Танзимоти VPN:**\n\nҲозир серверҳои Олмон ва Финлянд дастрасанд. Барои гирифтани калид ба @admin муроҷиат кунед.", call.message.chat.id, call.message.message_id, reply_markup=main_menu())
+    
+    elif call.data == "wallet":
+        bot.edit_message_text("🏦 **Сандуқи шумо:**\n\nБаланс: 0.00 TJS\n\nБарои пур кардан: /deposit", call.message.chat.id, call.message.message_id, reply_markup=main_menu())
+    
+    elif call.data == "profile":
+        bot.answer_callback_query(call.id)
+        bot.send_message(call.message.chat.id, f"👤 **Профили шумо:**\n\n🆔 ID: `{call.from_user.id}`\n📅 Сана: 2026\n💎 Статус: VIP Корбар")
+
+    elif call.data == "security":
+        bot.edit_message_text("🛡 **Амният:**\n\nҲамаи пайвастҳои шумо бо шифргузории AES-256 ҳимоя шудаанд.", call.message.chat.id, call.message.message_id, reply_markup=main_menu())
+
+    elif call.data == "ai_chat":
+        bot.answer_callback_query(call.id, "🤖 AI Чат фаъол шуд! Саволи худро нависед.")
+
+# 🚀 ОҒОЗИ СЕРВЕР
+if __name__ == "__main__":
+    t = Thread(target=run)
+    t.start()
+    bot.infinity_polling()
 
 
 
