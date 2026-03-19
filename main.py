@@ -157,3 +157,24 @@ def shop_module(call):
 def back_home(call):
     bot.edit_message_text(f"💎 **Хуш омадед, Шеф {call.from_user.first_name}!**\n\nМенюи асосӣ омода аст:", 
                           call.message.chat.id, call.message.message_id, reply_markup=main_keyboard())
+# --- ПАНЕЛИ АДМИН (ADMIN PANEL) ---
+@bot.callback_query_handler(func=lambda call: call.data == "admin_panel")
+def admin_main(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "❌ Шумо ҳуқуқи админ надоред!")
+        return
+
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    markup.add(
+        types.InlineKeyboardButton("📢 Фиристодани хабар (Рассылка)", callback_data="admin_broadcast"),
+        types.InlineKeyboardButton("👥 Омори корбарон", callback_data="admin_stats"),
+        types.InlineKeyboardButton("💰 Додани пул (Give)", callback_data="admin_give"),
+        types.InlineKeyboardButton("🔙 Ба қафо", callback_data="back_to_main")
+    )
+    bot.edit_message_text("👑 **ПАНЕЛИ ШЕФ (ADMIN):**\n\nҲамаи фишангҳои идора дар инҷост.", 
+                          call.message.chat.id, call.message.message_id, reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: call.data == "admin_stats")
+def admin_stats(call):
+    # Дар инҷо баъдтар логикаи ҳисоб кардани одамонро аз база илова мекунем
+    bot.send_message(call.message.chat.id, "👥 **ОМОР:**\n\nКорбарони умумӣ: 1\nБотҳои сохташуда: 0\nФоидаи имрӯза: 0 TJS")
