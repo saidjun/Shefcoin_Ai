@@ -101,4 +101,40 @@ class UltraMaxEmpire:
 empire = UltraMaxEmpire()
 print("✅ ULTRA-MAX EMPIRE SYSTEM INITIALIZED. NO MORE UPDATES NEEDED.")
 
+# ==========================================
+# 💎 RECOVERY & BUTTON FIX MODULE (ID 000001)
+# ==========================================
+
+# 1. БАРҚАРОР КАРДАНИ ID-И МАХСУС
+SHEF_ID_RECOVERY = 6967256070  # Ин ID-и ту ҳамчун 000001
+ADMIN_ROLE = "GOD_MODE"
+
+def restore_shef_account():
+    # ID 000001-ро дар база барқарор мекунад
+    db.execute("INSERT OR IGNORE INTO users (id, username, balance, role) VALUES (?, ?, ?, ?)", 
+               (SHEF_ID_RECOVERY, 'Shef_000001', 999999, 'ADMIN'))
+    print("✅ Акаунти 000001 барқарор шуд!")
+
+# 2. ИСЛОҲИ ТУГМАҲО (CALLBACK HANDLER FIX)
+# Ин қисм барои он аст, ки тугмаҳо "дарун ба дарун" кушода шаванд
+@bot.callback_query_handler(func=lambda call: True)
+def global_button_fix(call):
+    # Тафтиши пайваст бо сервер
+    if call.data == "main_menu":
+        main_menu(call.message)
+    
+    # Ислоҳ барои VPN, Proxy ва ғайра
+    elif call.data.startswith("vpn_") or call.data.startswith("adm_"):
+        # Ин ҷо модул автоматӣ функсияро мехонад
+        process_inner_menu(call)
+        
+    # Тасдиқи қабул (барои он ки тугма "часпида" намонад)
+    bot.answer_callback_query(call.id)
+
+# 3. ЧАРО СЕРВЕР ДАРКОР АСТ?
+def server_status_check():
+    # Агар сервер набошад, Webhook кор намекунад
+    status = "🔴 ОГОҲӢ: Барои кори 1000 функсия сервери RENDER ё VPS ҳатмист!"
+    return status
+
 
