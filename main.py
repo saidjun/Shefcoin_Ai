@@ -381,4 +381,21 @@ os.makedirs('папкаи_нав', exist_ok=True)
 # Ин код маълумотро ба охири файл илова мекунад, чизеро нест намекунад
 with open("log.txt", "a") as file:
     file.write("Сатри нав\n")
+import os
 
+# Роҳ ба папкаро ишора кунед
+directory = "папкаи_нав"
+
+# exist_ok=True намегузорад, ки хатогӣ сар занад, агар папка аллакай бошад
+os.makedirs(directory, exist_ok=True)
+
+print(f"Папкаи '{directory}' омода аст!")
+
+from pathlib import Path
+
+# Папкаро муайян мекунем
+Path("папкаи_нав").mkdir(parents=True, exist_ok=True)
+
+print("Ҳамааш даст ёфт!")
+import os
+os.system("mkdir -p папкаи_нав")
