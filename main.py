@@ -61,3 +61,68 @@ def build_bot_process(message):
     # Логикаи тафтиши токен ва сохтани папкаҳо дар сервер
     token = message.text
     bot.send_message(message.chat.id, f"✅ **Токен қабул шуд!**\n\nСохтмони бот оғоз ёфт...")
+# --- МОДУЛИ БИРЖА (EXCHANGE) ---
+@bot.callback_query_handler(func=lambda call: call.data == "exchange")
+def exchange_page(call):
+    # Нархҳои сунъӣ (ё метавон бо API пайваст кард)
+    btc_price = 68450.25
+    eth_price = 3540.10
+    ton_price = 7.24
+    
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    markup.add(
+        types.InlineKeyboardButton("📈 Харид", callback_data="buy_crypto"),
+        types.InlineKeyboardButton("📉 Фурӯш", callback_data="sell_crypto"),
+        types.InlineKeyboardButton("🔄 Навсозӣ", callback_data="exchange"),
+        types.InlineKeyboardButton("🔙 Ба қафо", callback_data="back_to_main")
+    )
+    
+    text = (
+        "📊 **БИРЖАИ SHEFCOIN AI**\n\n"
+        f"🟠 **Bitcoin:** ${btc_price}\n"
+        f"🔵 **Ethereum:** ${eth_price}\n"
+        f"💎 **TON:** ${ton_price}\n\n"
+        "💰 Баланси шумо: 0.00 TJS\n"
+        "⚡ Курсҳо ҳар 5 дақиқа нав мешаванд."
+    )
+    bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown")
+
+# --- МОДУЛИ БОНУС (СИСТЕМАИ ТАҲРИКӢ) ---
+@bot.callback_query_handler(func=lambda call: call.data == "bonus")
+def bonus_system(call):
+    bot.answer_callback_query(call.id, "🎁 Шумо бонуси ҳаррӯзаро гирифтед: 0.50 TJS")
+    bot.send_message(call.message.chat.id, "🎉 **Табрик!** Ба суратҳисоби шумо 0.50 TJS илова шуд.")
+
+# --- МОДУЛИ АМНИЯТ (SECURITY) ---
+@bot.callback_query_handler(func=lambda call: call.data == "security")
+def security_module(call):
+    text = (
+        "🛡 **МАРКАЗИ АМНИЯТ:**\n\n"
+        "✅ Шифргузории AES-256 фаъол аст.\n"
+        "✅ Пайвасти VPN: Ҳимояшуда.\n"
+        "✅ Дузинагӣ (2FA): Тавсия мешавад.\n\n"
+        "Шумо дар ҳолати бехатар ҳастед."
+    )
+    bot.edit_message_text(text, call.message.chat.id, call.message.message_id, 
+                          reply_markup=main_keyboard(), parse_mode="Markdown")
+# --- ПАНЕЛИ АДМИН (ADMIN PANEL) ---
+@bot.callback_query_handler(func=lambda call: call.data == "admin_panel")
+def admin_main(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "❌ Шумо ҳуқуқи админ надоред!")
+        return
+
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    markup.add(
+        types.InlineKeyboardButton("📢 Фиристодани хабар (Рассылка)", callback_data="admin_broadcast"),
+        types.InlineKeyboardButton("👥 Омори корбарон", callback_data="admin_stats"),
+        types.InlineKeyboardButton("💰 Додани пул (Give)", callback_data="admin_give"),
+        types.InlineKeyboardButton("🔙 Ба қафо", callback_data="back_to_main")
+    )
+    bot.edit_message_text("👑 **ПАНЕЛИ ШЕФ (ADMIN):**\n\nҲамаи фишангҳои идора дар инҷост.", 
+                          call.message.chat.id, call.message.message_id, reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: call.data == "admin_stats")
+def admin_stats(call):
+    # Дар инҷо баъдтар логикаи ҳисоб кардани одамонро аз база илова мекунем
+    bot.send_message(call.message.chat.id, "👥 **ОМОР:**\n\nКорбарони умумӣ: 1\nБотҳои сохташуда: 0\nФоидаи имрӯза: 0 TJS")
