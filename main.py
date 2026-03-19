@@ -362,5 +362,92 @@ if __name__ == "__main__":
     t.start()
     bot.infinity_polling()
 
+import telebot
+import os
+from flask import Flask
+from threading import Thread
+
+# 👑 ТАНЗИМОТИ АСОСӢ
+TOKEN = os.environ.get('BOT_TOKEN')
+bot = telebot.TeleBot(TOKEN)
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "🌐 Shefcoin AI Server is Online!"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+# 🛠 МЕНЮИ АСОСӢ
+def main_menu():
+    markup = telebot.types.InlineKeyboardMarkup(row_width=2)
+    markup.add(
+        telebot.types.InlineKeyboardButton("🛰 VPN & Proxy", callback_data="vpn"),
+        telebot.types.InlineKeyboardButton("🏦 Сандуқ (Пул)", callback_data="wallet"),
+        telebot.types.InlineKeyboardButton("👤 Профил", callback_data="profile"),
+        telebot.types.InlineKeyboardButton("🛡 Амният", callback_data="security"),
+        telebot.types.InlineKeyboardButton("🤖 AI Чат (Gemini)", callback_data="ai_chat"),
+        telebot.types.InlineKeyboardButton("📞 Дастгирӣ", callback_data="support")
+    )
+    return markup
+
+# 🚀 ФАРМОНИ START
+@bot.message_handler(commands=['start'])
+def start(message):
+    welcome_text = (
+        f"💎 **Хуш омадед, Шеф {message.from_user.first_name}!**\n\n"
+        "Ин боти универсалии Shefcoin AI мебошад. "
+        "Ҳамаи хизматрасониҳо дар зер омодаанд:"
+    )
+    bot.send_message(message.chat.id, welcome_text, reply_markup=main_menu(), parse_mode="Markdown")
+
+# ⚙️ ИДОРАИ ТУГМАҲО (CALLBACK)
+@bot.callback_query_handler(func=lambda call: True)
+def handle_query(call):
+    # --- БАХШИ VPN ---
+    if call.data == "vpn":
+        vpn_text = (
+            "🛰 **ХИЗМАТРАСОНИИ VPN:**\n\n"
+            "✅ Суръат: то 100 Мбит/с\n"
+            "🌍 Серверҳо: Олмон, ИМА, Туркия\n"
+            "💳 Нарх: 20 TJS / моҳ\n\n"
+            "Барои гирифтани калиди V2Ray ба @admin нависед."
+        )
+        bot.edit_message_text(vpn_text, call.message.chat.id, call.message.message_id, reply_markup=main_menu(), parse_mode="Markdown")
+
+    # --- БАХШИ САНДУҚ ---
+    elif call.data == "wallet":
+        wallet_text = (
+            "🏦 **САНДУҚИ МОЛИЯВӢ:**\n\n"
+            "💰 Баланси шумо: 0.00 TJS\n"
+            "🪙 ShefCoin: 0 SHC\n\n"
+            "Барои пур кардани баланс (Алиф/Душанбе Сити) тугмаи 'Пур кардан'-ро пахш кунед."
+        )
+        bot.edit_message_text(wallet_text, call.message.chat.id, call.message.message_id, reply_markup=main_menu(), parse_mode="Markdown")
+
+    # --- БАХШИ ПРОФИЛ ---
+    elif call.data == "profile":
+        user_info = (
+            "👤 **МАЪЛУМОТИ ШУМО:**\n\n"
+            f"🆔 ID: `{call.from_user.id}`\n"
+            f"👤 Ном: {call.from_user.first_name}\n"
+            "💎 Статус: VIP\n"
+            "📅 Санаи сабт: 2026"
+        )
+        bot.answer_callback_query(call.id)
+        bot.send_message(call.message.chat.id, user_info, parse_mode="Markdown")
+
+    # --- БАХШИ AI ЧАТ ---
+    elif call.data == "ai_chat":
+        bot.answer_callback_query(call.id, "🤖 AI Чат фаъол аст! Танҳо саволи худро нависед.")
+        bot.send_message(call.message.chat.id, "🤖 Ман Геммни ҳастам. Чӣ хел ба шумо кӯмак кунам?")
+
+# 🚀 ОҒОЗИ СИСТЕМА
+if __name__ == "__main__":
+    t = Thread(target=run)
+    t.start()
+    print("✅ СЕРВЕР ВА БОТ БО МУВАФФАҚИЯТ ОҒОЗ ШУД!")
+    bot.infinity_polling()
 
 
