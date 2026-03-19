@@ -257,6 +257,31 @@ def imperial_auto_start():
 if __name__ == "__main__":
     imperial_auto_start()
     bot.infinity_polling()
+    # ==========================================
+# 🌐 RENDER WEB-SERVER ENABLER (v45)
+# ==========================================
+from flask import Flask
+from threading import Thread
+
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "🌐 ShefCoin-AI Empire is Online!"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+# Инро пеш аз bot.infinity_polling() илова кун
+if __name__ == "__main__":
+    keep_alive() # Сайт фаъол мешавад
+    imperial_auto_start()
+    bot.infinity_polling()
+
 
 
 
